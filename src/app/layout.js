@@ -3,8 +3,8 @@ import { AuthContextProvider } from '@/context/AuthContext';
 import './globals.css';
 
 export const metadata = {
-  title: 'Firebase Auth App',
-  description: 'Authentication with Firebase and Next.js',
+  title: 'Mectora - AI-Powered Career Platform for Students',
+  description: 'Mectora helps students excel in their career journey with AI-powered interview practice, ATS-friendly resume building, and personalized skill development tools. Prepare for your dream job with confidence.',
 };
 
 export default function RootLayout({ children }) {
