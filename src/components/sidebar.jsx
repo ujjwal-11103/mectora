@@ -50,7 +50,7 @@ export function Sidebar() {
             <div className="flex items-center gap-3 p-4">
                 <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-gray-200">
                     <Image
-                        src={"/user.jpg"}
+                        src={user?.photoURL || "/user.jpg"} // fallback to local image
                         alt="User avatar"
                         fill
                         sizes="40px"
