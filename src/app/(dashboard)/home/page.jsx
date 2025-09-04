@@ -4,6 +4,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 export default function page() {
   const { user, logout } = useAuth();
@@ -21,7 +22,12 @@ export default function page() {
     return null;
   }
 
+  // Use the extended profile hook
+  const { userProfile, loading } = useUserProfile();
+
+  if (loading) return <div>Loading profile...</div>;
   console.log("User :", user);
+  console.log("UserProfile :", userProfile);
 
   return (
     <div className="min-h-screen p-24">
@@ -39,6 +45,12 @@ export default function page() {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Welcome, {user.email}!</h2>
           <p className="text-gray-600">You are successfully logged in.</p>
+
+          <div>
+            <p>Email verified: {userProfile?.emailVerified ? 'Yes' : 'No'}</p>
+            <p>Account created: {userProfile?.createdAt}</p>
+            <p>Last login: {userProfile?.lastLoginAt}</p>
+          </div>
         </div>
       </div>
     </div>
