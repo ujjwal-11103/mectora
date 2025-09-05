@@ -21,7 +21,7 @@ export async function POST(request) {
     }
 
     // Validate required fields
-    if (!jobData.title || !jobData.applyUrl) {
+    if (!jobData.title) {
       return NextResponse.json(
         {
           success: false,

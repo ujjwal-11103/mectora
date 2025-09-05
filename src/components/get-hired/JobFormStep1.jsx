@@ -11,6 +11,9 @@ export default function JobFormStep1({ formData, setFormData, setParsedData, set
     const { parseJobDescription, loading, error } = useJobPosting();
     const [fileError, setFileError] = useState('');
 
+    // console.log("formData inJF1", formData);
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFileError('');
@@ -30,6 +33,12 @@ export default function JobFormStep1({ formData, setFormData, setParsedData, set
         formDataToSend.append('userId', user.uid); // ← Add user ID for storage path
         if (formData.jdFile) formDataToSend.append('jdFile', formData.jdFile);
         if (formData.jdText) formDataToSend.append('jdText', formData.jdText);
+
+        // console.log("formDataToSend entries:");
+        // for (let [key, value] of formDataToSend.entries()) {
+        //     console.log(key, value);
+        // }
+
 
         setUploading(true);
 
@@ -130,11 +139,11 @@ export default function JobFormStep1({ formData, setFormData, setParsedData, set
                 {isProcessing ? 'Processing...' : 'Next →'}
             </button>
 
-            {uploading && (
+            {/* {uploading && (
                 <div className="bg-blue-50 border border-blue-200 text-blue-700 p-3 rounded-md">
                     <p>Uploading PDF file...</p>
                 </div>
-            )}
+            )} */}
         </form>
     );
 }

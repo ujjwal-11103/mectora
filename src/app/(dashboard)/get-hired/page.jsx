@@ -14,7 +14,7 @@ export default function GetHiredPage() {
     title: '',
     jdFile: null,
     jdText: '',
-    applyUrl: '',
+    // applyUrl: '',
     
     // Step 2 data (will be filled from API)
     location: '',

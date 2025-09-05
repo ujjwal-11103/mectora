@@ -11,6 +11,11 @@ export const useJobPosting = () => {
     setLoading(true);
     setError(null);
 
+    // console.log("formData in hook:");
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(key, value);
+    // }
+
     try {
       const response = await fetch('/api/parse-job', {
         method: 'POST',
@@ -47,6 +52,8 @@ export const useJobPosting = () => {
         },
         body: JSON.stringify(jobData),
       });
+
+      console.log("Response", response);
 
       // Check if response is OK and has content
       if (!response.ok) {

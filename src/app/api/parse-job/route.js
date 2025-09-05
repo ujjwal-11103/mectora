@@ -10,9 +10,14 @@ function generateMockJobData(jobTitle, jdText) {
   const skills = ['React', 'Node.js', 'Python', 'AWS', 'TypeScript', 'MongoDB', 'PostgreSQL'];
 
   // Extract some skills from JD text if provided
-  const extractedSkills = jdText
-    ? skills.filter(skill => jdText.toLowerCase().includes(skill.toLowerCase()))
-    : [];
+  let extractedSkills = [];
+  if (jdText) {
+    const normalizedText = jdText.toLowerCase().replace(/[^\w\s]/g, ' ');
+    extractedSkills = skills.filter(skill =>
+      normalizedText.includes(skill.toLowerCase())
+    );
+  }
+
 
   return {
     location: locations[Math.floor(Math.random() * locations.length)],

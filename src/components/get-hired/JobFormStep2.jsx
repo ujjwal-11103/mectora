@@ -7,6 +7,7 @@ export default function JobFormStep2({ formData, setFormData, parsedData, setCur
   const { createJobPosting, loading, error } = useJobPosting();
   const [submitError, setSubmitError] = useState('');
 
+  console.log("Form Data in comp2", formData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
