@@ -4,21 +4,35 @@
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
-    // If user is already logged in, redirect to dashboard
-    if (user) {
+    if (user && !authLoading) {
+      setIsRedirecting(true);
       router.push('/home');
     }
-  }, [user, router]);
+  }, [user, authLoading, router]);
 
+  // ✅ Show loading state instead of early return
+  if (authLoading || isRedirecting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Only render when we're sure user is not logged in
   if (user) {
-    return null; // Or a loading indicator
+    return null;
   }
 
   return (

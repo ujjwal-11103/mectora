@@ -17,7 +17,12 @@ export default function DashboardLayout({ children }) {
 
     // while checking auth, you may want to show a loader (optional)
     if (user === undefined) {
-        return <div className="p-6">Loading...</div>;
+        return <div className="flex min-h-screen items-center justify-center p-24">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading...</p>
+            </div>
+        </div>;
     }
 
     return (
