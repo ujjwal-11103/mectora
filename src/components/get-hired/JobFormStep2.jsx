@@ -5,15 +5,25 @@ import { useJobPosting } from '@/hooks/useJobPosting';
 
 export default function JobFormStep2({ formData, setFormData, parsedData, setCurrentStep }) {
   const { createJobPosting, loading, error } = useJobPosting();
+  const [submitError, setSubmitError] = useState('');
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setSubmitError('');
+
     try {
-      await createJobPosting(formData);
-      setCurrentStep(3);
+      const result = await createJobPosting(formData);
+
+      if (result.success) {
+        setCurrentStep(3);
+      } else {
+        setSubmitError(result.error || 'Failed to create job posting');
+      }
+
     } catch (err) {
-      console.error('Error:', err);
+      setSubmitError(err.message || 'An unexpected error occurred');
+      console.error('Submission error:', err);
     }
   };
 
@@ -109,9 +119,13 @@ export default function JobFormStep2({ formData, setFormData, parsedData, setCur
         />
       </div>
 
-      {error && (
+      {(error || submitError) && (
         <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md">
-          {error}
+          <p className="font-semibold">Error:</p>
+          <p>{error || submitError}</p>
+          <p className="text-sm mt-2">
+            Please check the console for more details or try again.
+          </p>
         </div>
       )}
 

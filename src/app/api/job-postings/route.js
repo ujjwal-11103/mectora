@@ -5,12 +5,29 @@ import { Timestamp } from 'firebase-admin/firestore';
 
 export async function POST(request) {
   try {
-    const jobData = await request.json();
+    // Check if request body is valid JSON
+    let jobData;
+    try {
+      jobData = await request.json();
+    } catch (parseError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid JSON data in request body',
+          details: parseError.message
+        },
+        { status: 400 }
+      );
+    }
 
     // Validate required fields
     if (!jobData.title || !jobData.applyUrl) {
       return NextResponse.json(
-        { success: false, error: 'Title and apply URL are required' },
+        {
+          success: false,
+          error: 'Title and apply URL are required',
+          receivedData: jobData
+        },
         { status: 400 }
       );
     }
@@ -42,14 +59,30 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       id: docRef.id,
-      message: 'Job posting created successfully'
+      message: 'Job posting created successfully',
+      data: jobPosting
     });
 
   } catch (error) {
     console.error('Error creating job posting:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to create job posting' },
+      {
+        success: false,
+        error: 'Failed to create job posting',
+        details: error.message
+      },
       { status: 500 }
     );
   }
+}
+
+// Add a GET method to handle accidental GET requests
+export async function GET() {
+  return NextResponse.json(
+    {
+      success: false,
+      error: 'Method not allowed. Use POST to create job postings.'
+    },
+    { status: 405 }
+  );
 }

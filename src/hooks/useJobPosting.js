@@ -10,7 +10,7 @@ export const useJobPosting = () => {
   const parseJobDescription = async (formData) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/parse-job', {
         method: 'POST',
@@ -18,7 +18,7 @@ export const useJobPosting = () => {
       });
 
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.error || 'Failed to parse job description');
       }
@@ -34,9 +34,11 @@ export const useJobPosting = () => {
   };
 
   const createJobPosting = async (jobData) => {
+
     setLoading(true);
     setError(null);
-    
+    setData(null);
+
     try {
       const response = await fetch('/api/job-postings', {
         method: 'POST',
@@ -46,16 +48,38 @@ export const useJobPosting = () => {
         body: JSON.stringify(jobData),
       });
 
-      const result = await response.json();
-      
+      // Check if response is OK and has content
       if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Check if response has content before parsing
+      const contentLength = response.headers.get('content-length');
+      if (contentLength === '0' || !response.body) {
+        throw new Error('Empty response from server');
+      }
+
+      const text = await response.text();
+
+      // Check if text is not empty before parsing JSON
+      if (!text.trim()) {
+        throw new Error('Empty response body');
+      }
+
+      const result = JSON.parse(text);
+
+      if (!result.success) {
         throw new Error(result.error || 'Failed to create job posting');
       }
 
+      setData(result);
       return result;
+
     } catch (err) {
-      setError(err.message);
-      throw err;
+      const errorMessage = err.message || 'Failed to create job posting';
+      setError(errorMessage);
+      console.error('Job posting error:', err);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
