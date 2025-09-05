@@ -116,20 +116,6 @@ export default function JobFormStep1({ formData, setFormData, setParsedData, set
                 </div>
             </div>
 
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Application URL *
-                </label>
-                <input
-                    type="url"
-                    value={formData.applyUrl}
-                    onChange={(e) => setFormData(prev => ({ ...prev, applyUrl: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://company.com/apply"
-                    required
-                />
-            </div>
-
             {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md">
                     {error}

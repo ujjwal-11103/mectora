@@ -42,7 +42,7 @@ export async function POST(request) {
       jdPdfUrl: jobData.jdPdfUrl || null,
       jdSummary: jobData.jdSummary || null,
       skills: jobData.skills || [],
-      applyUrl: jobData.applyUrl,
+      // applyUrl: jobData.applyUrl,
       practiceUrl: '', // Will be updated later from backend
       isActive: true,
       postedAt: Timestamp.now(),

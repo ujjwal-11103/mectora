@@ -21,6 +21,7 @@ const navItems = [
     { label: "Home", href: "/home", icon: Home },
     { label: "Resume Builder", href: "/resume-builder", icon: FileText },
     { label: "Interview Prep", href: "/interview-prep", icon: BookOpen },
+    { label: "Browse Jobs", href: "/all-jobs", icon: BriefcaseBusiness },
     { label: "Get Hired", href: "/get-hired", icon: BriefcaseBusiness },
     { label: "Profile Setting", href: "/profile-setting", icon: Settings },
     { label: "Help", href: "/help", icon: HelpCircle },

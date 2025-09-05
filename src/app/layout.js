@@ -1,6 +1,7 @@
 // src/app/layout.js
 import { AuthContextProvider } from '@/context/AuthContext';
 import './globals.css';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
   title: 'Mectora - AI-Powered Career Platform for Students',
@@ -13,6 +14,7 @@ export default function RootLayout({ children }) {
       <body>
         <AuthContextProvider>
           {children}
+          <Toaster position="top-right" reverseOrder={false} />
         </AuthContextProvider>
       </body>
     </html>
