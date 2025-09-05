@@ -2,6 +2,8 @@
 import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage'; // ← Add this
+
 
 // Method 1: Using environment variables (Recommended for deployment)
 const adminConfig = {
@@ -10,6 +12,8 @@ const adminConfig = {
         clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
         privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
     }),
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+
 };
 
 // Initialize only if it hasn't been initialized already
@@ -21,3 +25,5 @@ if (!getApps().length) {
 // Export the initialized services
 export const adminAuth = getAuth();
 export const adminFirestore = getFirestore();
+export const adminStorage = getStorage(); // ← Add this
+export const adminApp = getApps()[0]; // ← Export the app instance

@@ -2,8 +2,12 @@
 'use client';
 import { useState } from 'react';
 import { useJobPosting } from '@/hooks/useJobPosting';
+import { useAuth } from '@/context/AuthContext'; // ← Add this import
+
 
 export default function JobFormStep1({ formData, setFormData, setParsedData, setCurrentStep }) {
+    const { user } = useAuth(); // ← Get current user
+    const [uploading, setUploading] = useState(false);
     const { parseJobDescription, loading, error } = useJobPosting();
     const [fileError, setFileError] = useState('');
 
@@ -23,8 +27,11 @@ export default function JobFormStep1({ formData, setFormData, setParsedData, set
 
         const formDataToSend = new FormData();
         formDataToSend.append('jobTitle', formData.title);
+        formDataToSend.append('userId', user.uid); // ← Add user ID for storage path
         if (formData.jdFile) formDataToSend.append('jdFile', formData.jdFile);
         if (formData.jdText) formDataToSend.append('jdText', formData.jdText);
+
+        setUploading(true);
 
         try {
             const result = await parseJobDescription(formDataToSend);
@@ -32,23 +39,38 @@ export default function JobFormStep1({ formData, setFormData, setParsedData, set
             setFormData(prev => ({
                 ...prev,
                 jdRawText: result.rawText,
+                jdPdfUrl: result.jdPdfUrl || null, // ← Store the PDF URL
                 ...result.data
             }));
             setCurrentStep(2);
         } catch (err) {
             console.error('Error:', err);
+        } finally {
+            setUploading(false);
         }
     };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        if (file && file.type !== 'application/pdf') {
-            setFileError('Please upload a PDF file');
-            return;
+        if (file) {
+            // Check file type
+            if (file.type !== 'application/pdf') {
+                setFileError('Please upload a PDF file');
+                return;
+            }
+
+            // Check file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                setFileError('File size must be less than 5MB');
+                return;
+            }
         }
+
         setFileError('');
         setFormData(prev => ({ ...prev, jdFile: file }));
     };
+
+    const isProcessing = loading || uploading;
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -116,11 +138,17 @@ export default function JobFormStep1({ formData, setFormData, setParsedData, set
 
             <button
                 type="submit"
-                disabled={loading}
+                disabled={isProcessing}
                 className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
-                {loading ? 'Parsing Job Description...' : 'Next →'}
+                {isProcessing ? 'Processing...' : 'Next →'}
             </button>
+
+            {uploading && (
+                <div className="bg-blue-50 border border-blue-200 text-blue-700 p-3 rounded-md">
+                    <p>Uploading PDF file...</p>
+                </div>
+            )}
         </form>
     );
 }
