@@ -14,21 +14,21 @@ export async function GET() {
             const data = doc.data();
 
             // Only include active jobs
-            if (data.isActive !== false) { // Default to true if undefined
-                jobs.push({
-                    id: doc.id,
-                    title: data.title,
-                    company: data.company,
-                    location: data.location,
-                    employmentType: data.employmentType,
-                    workMode: data.workMode,
-                    jdSummary: data.jdSummary,
-                    skills: data.skills,
-                    postedAt: data.postedAt?.toDate().toISOString(),
-                    metrics: data.metrics,
-                    isActive: data.isActive // For sorting
-                });
-            }
+            // if (data.isActive !== false) { // Default to true if undefined
+            jobs.push({
+                id: doc.id,
+                title: data.title,
+                company: data.company,
+                location: data.location,
+                employmentType: data.employmentType,
+                workMode: data.workMode,
+                jdSummary: data.jdSummary,
+                skills: data.skills,
+                postedAt: data.postedAt?.toDate().toISOString(),
+                metrics: data.metrics,
+                isActive: data.isActive // For sorting
+            });
+            // }
         });
 
         // Manual sorting - most recent first

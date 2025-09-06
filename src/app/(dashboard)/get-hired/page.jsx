@@ -15,7 +15,7 @@ export default function GetHiredPage() {
     jdFile: null,
     jdText: '',
     // applyUrl: '',
-    
+
     // Step 2 data (will be filled from API)
     location: '',
     employmentType: '',
@@ -30,6 +30,16 @@ export default function GetHiredPage() {
 
   if (!user) {
     return <div>Please log in to access this page</div>;
+  }
+  if (!user?.isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h2>
+          <p>You need admin privileges to access this page.</p>
+        </div>
+      </div>
+    );
   }
 
   const steps = {
@@ -62,19 +72,17 @@ export default function GetHiredPage() {
               {[1, 2, 3].map((step) => (
                 <div key={step} className="flex items-center">
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      currentStep >= step
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= step
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-200 text-gray-600'
-                    }`}
+                      }`}
                   >
                     {step}
                   </div>
                   {step < 3 && (
                     <div
-                      className={`w-16 h-1 mx-2 ${
-                        currentStep > step ? 'bg-blue-600' : 'bg-gray-200'
-                      }`}
+                      className={`w-16 h-1 mx-2 ${currentStep > step ? 'bg-blue-600' : 'bg-gray-200'
+                        }`}
                     />
                   )}
                 </div>

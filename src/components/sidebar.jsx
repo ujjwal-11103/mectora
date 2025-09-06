@@ -12,6 +12,7 @@ import {
     Settings,
     HelpCircle,
     LogOut,
+    UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -22,7 +23,7 @@ const navItems = [
     { label: "Resume Builder", href: "/resume-builder", icon: FileText },
     { label: "Interview Prep", href: "/interview-prep", icon: BookOpen },
     { label: "Browse Jobs", href: "/all-jobs", icon: BriefcaseBusiness },
-    { label: "Get Hired", href: "/get-hired", icon: BriefcaseBusiness },
+    { label: "Get Hired", href: "/get-hired", icon: UserPlus },
     { label: "Profile Setting", href: "/profile-setting", icon: Settings },
     { label: "Help", href: "/help", icon: HelpCircle },
 ];
@@ -44,66 +45,72 @@ export function Sidebar() {
 
     return (
         <aside
-            className="flex h-full w-64 flex-col border-r bg-white"
+            className="fixed left-0 top-0 h-screen w-64 flex flex-col justify-between border-r bg-white"
             aria-label="Sidebar"
         >
-            {/* Header: avatar + name */}
-            <div className="flex items-center gap-3 p-4">
-                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-gray-200">
-                    <Image
-                        src={user?.photoURL || "/user.jpg"} // fallback to local image
-                        alt="User avatar"
-                        fill
-                        sizes="40px"
-                        className="object-cover"
-                    />
+            {/* Top section: avatar + nav */}
+            <div className="overflow-y-auto">
+                <div className="flex items-center gap-3 p-4">
+                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-gray-200">
+                        <Image
+                            src={user?.photoURL || "/user.jpg"}
+                            alt="User avatar"
+                            fill
+                            sizes="40px"
+                            className="object-cover"
+                        />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-gray-900">{user?.displayName}</p>
+                        <p className="truncate text-xs text-gray-500">Welcome back</p>
+                    </div>
                 </div>
-                <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-gray-900">{user?.displayName}</p>
-                    <p className="truncate text-xs text-gray-500">Welcome back</p>
-                </div>
+
+                {/* Nav */}
+                <nav className="mt-2 px-3">
+                    <ul className="flex flex-col gap-1">
+                        {navItems.map((item) => {
+                            if (item.label === "Get Hired" && !user?.isAdmin) {
+                                return null;
+                            }
+
+                            const Icon = item.icon;
+                            const isActive =
+                                pathname === item.href ||
+                                (item.href !== "/" && pathname?.startsWith(item.href));
+
+                            return (
+                                <li key={item.href}>
+                                    <Link
+                                        href={item.href}
+                                        className={cn(
+                                            "group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition",
+                                            "outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-blue-500",
+                                            isActive
+                                                ? "bg-blue-50 text-blue-700 ring-1 ring-blue-100"
+                                                : "text-gray-700 hover:bg-gray-50"
+                                        )}
+                                        aria-current={isActive ? "page" : undefined}
+                                    >
+                                        <Icon
+                                            className={cn(
+                                                "h-5 w-5",
+                                                isActive
+                                                    ? "text-blue-600"
+                                                    : "text-gray-500 group-hover:text-gray-700"
+                                            )}
+                                            aria-hidden="true"
+                                        />
+                                        <span className="truncate">{item.label}</span>
+                                    </Link>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </nav>
             </div>
 
-            {/* Nav */}
-            <nav className="mt-2 flex-1 px-3">
-                <ul className="flex flex-col gap-1">
-                    {navItems.map((item) => {
-                        const Icon = item.icon;
-                        const isActive =
-                            pathname === item.href ||
-                            (item.href !== "/" && pathname?.startsWith(item.href));
-
-                        return (
-                            <li key={item.href}>
-                                <Link
-                                    href={item.href}
-                                    className={cn(
-                                        "group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition",
-                                        "outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-blue-500",
-                                        isActive
-                                            ? "bg-blue-50 text-blue-700 ring-1 ring-blue-100"
-                                            : "text-gray-700 hover:bg-gray-50"
-                                    )}
-                                    aria-current={isActive ? "page" : undefined}
-                                >
-                                    <Icon
-                                        className={cn(
-                                            "h-5 w-5",
-                                            isActive
-                                                ? "text-blue-600"
-                                                : "text-gray-500 group-hover:text-gray-700"
-                                        )}
-                                        aria-hidden="true"
-                                    />
-                                    <span className="truncate">{item.label}</span>
-                                </Link>
-                            </li>
-                        );
-                    })}
-                </ul>
-            </nav>
-
-            {/* Logout button fixed at bottom */}
+            {/* Logout button */}
             <div className="p-3">
                 <button
                     type="button"
@@ -112,7 +119,7 @@ export function Sidebar() {
                         "border-gray-200 text-gray-700 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200",
                         "outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-blue-500"
                     )}
-                    onClick={handleClose} // ✅ Use the corrected handler
+                    onClick={handleClose}
                     aria-label="Log out"
                 >
                     <LogOut className="h-5 w-5 text-gray-500 group-hover:text-blue-600" />
@@ -120,5 +127,7 @@ export function Sidebar() {
                 </button>
             </div>
         </aside>
+
+
     );
 }

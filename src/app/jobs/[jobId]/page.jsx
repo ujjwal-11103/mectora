@@ -4,14 +4,17 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { useAuth } from '@/context/AuthContext'; // ← Import useAuth
 
 export default function JobDetailPage() {
     const params = useParams();
     const router = useRouter();
+    const { user } = useAuth(); // ← Get current user
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [copied, setCopied] = useState(false);
+    const [updatingStatus, setUpdatingStatus] = useState(false);
 
     useEffect(() => {
         const fetchJob = async () => {
@@ -46,9 +49,11 @@ export default function JobDetailPage() {
             const jobUrl = `${window.location.origin}/jobs/${params.jobId}`;
             await navigator.clipboard.writeText(jobUrl);
             setCopied(true);
+            toast.success('Job link copied to clipboard!');
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error('Failed to copy:', err);
+            toast.error('Failed to copy link');
         }
     };
 
@@ -59,18 +64,38 @@ export default function JobDetailPage() {
             });
 
             if (response.ok) {
-                // Show toast notification
                 toast.success("You have successfully applied!");
-
-                // Optionally open apply link or redirect
-                // window.open(job.applyUrl, "_blank");
-                // router.push("/all-jobs");
             } else {
                 toast.error("Failed to apply. Please try again.");
             }
         } catch (err) {
             console.error("Failed to apply:", err);
             toast.error("Something went wrong!");
+        }
+    };
+
+    const toggleJobStatus = async () => {
+        if (!user?.isAdmin) return;
+
+        setUpdatingStatus(true);
+        try {
+            const response = await fetch(`/api/jobs/${params.jobId}/toggle-active`, {
+                method: "POST",
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setJob(prev => ({ ...prev, isActive: data.isActive }));
+                toast.success(data.message);
+            } else {
+                toast.error(data.error || 'Failed to update job status');
+            }
+        } catch (err) {
+            console.error("Failed to toggle job status:", err);
+            toast.error("Something went wrong!");
+        } finally {
+            setUpdatingStatus(false);
         }
     };
 
@@ -109,6 +134,43 @@ export default function JobDetailPage() {
                 <Link href="/all-jobs" className="text-blue-600 hover:underline mb-6 inline-block">
                     ← Back to all jobs
                 </Link>
+
+                {/* Admin Status Badge and Toggle */}
+                {user?.isAdmin && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="font-semibold text-yellow-800">Admin Controls</h3>
+                                <p className="text-yellow-700 text-sm">
+                                    Current status:
+                                    <span className={`ml-2 font-medium ${job.isActive ? 'text-green-600' : 'text-red-600'}`}>
+                                        {job.isActive ? 'Active' : 'Inactive'}
+                                    </span>
+                                </p>
+                            </div>
+                            <button
+                                onClick={toggleJobStatus}
+                                disabled={updatingStatus}
+                                className={`px-4 py-2 rounded-md font-medium ${job.isActive
+                                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                                        : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                    } disabled:opacity-50`}
+                            >
+                                {updatingStatus ? 'Updating...' : job.isActive ? 'Deactivate' : 'Activate'}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Status Badge for All Users */}
+                <div className="mb-4">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${job.isActive
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                        {job.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                </div>
 
                 <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                     <div className="flex justify-between items-start mb-6">

@@ -36,7 +36,8 @@ export async function GET(request, { params }) {
             skills: data.skills,
             postedAt: data.postedAt?.toDate().toISOString(),
             updatedAt: data.updatedAt?.toDate().toISOString(),
-            metrics: data.metrics
+            metrics: data.metrics,
+            isActive: data.isActive, // ← Add this
         };
 
         return NextResponse.json({ success: true, job });

@@ -26,9 +26,11 @@ export default function DashboardLayout({ children }) {
     }
 
     return (
-        <div className="grid min-h-dvh grid-cols-[16rem_1fr] bg-slate-50">
+        <div className="flex min-h-screen bg-slate-50">
             <Sidebar />
-            <main className="px-6 py-6">{children}</main>
+            <main className="ml-64 flex-1 p-6">
+                {children}
+            </main>
         </div>
     );
 }

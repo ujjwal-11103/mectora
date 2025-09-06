@@ -35,6 +35,7 @@ export default function page() {
 
   console.log("User :", user);
   console.log("UserProfile :", userProfile);
+  console.log("UserProfile admin:", user.isAdmin);
 
   return (
     <div className="min-h-screen p-24">
@@ -51,12 +52,13 @@ export default function page() {
 
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Welcome, {user.email}!</h2>
-          <p className="text-gray-600">You are successfully logged in.</p>
+          <p className="text-gray-600">You are successfully logged in...</p>
 
           <div>
             <p>Email verified: {userProfile?.emailVerified ? 'Yes' : 'No'}</p>
             <p>Account created: {userProfile?.createdAt}</p>
             <p>Last login: {userProfile?.lastLoginAt}</p>
+            <p>Admin Status: {user.isAdmin ? 'True' : 'False'}</p>
           </div>
         </div>
       </div>

@@ -53,6 +53,12 @@ export default function JobCard({ job }) {
                     <span className="text-sm text-gray-500">
                         Posted {formatDate(job.postedAt)}
                     </span>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${job.isActive
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                        }`}>
+                        {job.isActive ? 'Active' : 'Inactive'}
+                    </span>
                     <span className="text-sm text-gray-500">
                         {job.metrics?.applyClicks || 0} applies
                     </span>
