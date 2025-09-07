@@ -37,6 +37,7 @@ export async function GET(request, { params }) {
             postedAt: data.postedAt?.toDate().toISOString(),
             updatedAt: data.updatedAt?.toDate().toISOString(),
             metrics: data.metrics,
+            practiceUrl: data.practiceUrl, // ← Add this
             isActive: data.isActive, // ← Add this
         };
 

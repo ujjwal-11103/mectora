@@ -26,6 +26,7 @@ export async function GET() {
                 skills: data.skills,
                 postedAt: data.postedAt?.toDate().toISOString(),
                 metrics: data.metrics,
+                practiceUrl: data.practiceUrl, // ← Add this
                 isActive: data.isActive // For sorting
             });
             // }

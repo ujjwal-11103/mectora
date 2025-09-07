@@ -4,17 +4,18 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { useAuth } from '@/context/AuthContext'; // ← Import useAuth
+import { useAuth } from '@/context/AuthContext';
 
 export default function JobDetailPage() {
     const params = useParams();
     const router = useRouter();
-    const { user } = useAuth(); // ← Get current user
+    const { user } = useAuth();
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [copied, setCopied] = useState(false);
     const [updatingStatus, setUpdatingStatus] = useState(false);
+    const [practiceLoading, setPracticeLoading] = useState(false);
 
     useEffect(() => {
         const fetchJob = async () => {
@@ -71,6 +72,40 @@ export default function JobDetailPage() {
         } catch (err) {
             console.error("Failed to apply:", err);
             toast.error("Something went wrong!");
+        }
+    };
+
+    const handlePractice = async () => {
+        if (!job?.practiceUrl) return;
+
+        setPracticeLoading(true);
+        try {
+            // First, record the practice click
+            const response = await fetch(`/api/jobs/${params.jobId}/practice`, {
+                method: "POST",
+            });
+
+            if (response.ok) {
+                // Then open the practice URL in a new tab
+                window.open(job.practiceUrl, '_blank', 'noopener,noreferrer');
+                toast.success("Practice session started!");
+
+                // Refresh job data to update metrics
+                const jobResponse = await fetch(`/api/jobs/${params.jobId}`);
+                if (jobResponse.ok) {
+                    const jobData = await jobResponse.json();
+                    if (jobData.success) {
+                        setJob(jobData.job);
+                    }
+                }
+            } else {
+                toast.error("Failed to start practice session");
+            }
+        } catch (err) {
+            console.error("Failed to practice:", err);
+            toast.error("Something went wrong!");
+        } finally {
+            setPracticeLoading(false);
         }
     };
 
@@ -147,13 +182,18 @@ export default function JobDetailPage() {
                                         {job.isActive ? 'Active' : 'Inactive'}
                                     </span>
                                 </p>
+                                {job.practiceUrl && (
+                                    <p className="text-yellow-700 text-sm mt-1">
+                                        Practice URL: {job.practiceUrl}
+                                    </p>
+                                )}
                             </div>
                             <button
                                 onClick={toggleJobStatus}
                                 disabled={updatingStatus}
                                 className={`px-4 py-2 rounded-md font-medium ${job.isActive
-                                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                                        : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                    ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                                    : 'bg-green-100 text-green-700 hover:bg-green-200'
                                     } disabled:opacity-50`}
                             >
                                 {updatingStatus ? 'Updating...' : job.isActive ? 'Deactivate' : 'Activate'}
@@ -165,8 +205,8 @@ export default function JobDetailPage() {
                 {/* Status Badge for All Users */}
                 <div className="mb-4">
                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${job.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
                         }`}>
                         {job.isActive ? 'Active' : 'Inactive'}
                     </span>
@@ -221,7 +261,7 @@ export default function JobDetailPage() {
                         </div>
                     )}
 
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 flex-wrap">
                         <button
                             onClick={handleShare}
                             className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200"
@@ -241,12 +281,27 @@ export default function JobDetailPage() {
                             </svg>
                             Apply Now
                         </button>
+
+                        {/* Practice Button - Only show if practiceUrl exists */}
+                        {job.practiceUrl && (
+                            <button
+                                onClick={handlePractice}
+                                disabled={practiceLoading}
+                                className="flex items-center gap-2 bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700 disabled:opacity-50"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {practiceLoading ? 'Loading...' : 'Practice'}
+                            </button>
+                        )}
                     </div>
                 </div>
 
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <h3 className="text-lg font-semibold mb-4">Job Metrics</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div className="text-center">
                             <p className="text-2xl font-bold text-blue-600">{job.metrics?.applyClicks || 0}</p>
                             <p className="text-gray-600">Total Applies</p>
@@ -255,6 +310,14 @@ export default function JobDetailPage() {
                             <p className="text-2xl font-bold text-green-600">{job.metrics?.practiceClicks || 0}</p>
                             <p className="text-gray-600">Practice Sessions</p>
                         </div>
+                        {job.practiceUrl && (
+                            <div className="text-center">
+                                <p className="text-2xl font-bold text-purple-600">
+                                    {Math.round(((job.metrics?.practiceClicks || 0) / ((job.metrics?.applyClicks || 0) + (job.metrics?.practiceClicks || 0) || 1)) * 100)}%
+                                </p>
+                                <p className="text-gray-600">Practice Rate</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

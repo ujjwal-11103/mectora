@@ -144,7 +144,7 @@ export default function Login() {
                         type="button"
                         onClick={handleGoogleSignIn}
                         disabled={loading}
-                        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md border bg-background px-4 py-3 text-sm font-medium shadow-sm transition hover:bg-muted disabled:opacity-50"
+                        className="cursor-pointer mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md border bg-background px-4 py-3 text-sm font-medium shadow-sm transition hover:bg-muted disabled:opacity-50"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48" aria-hidden>
                             <path
