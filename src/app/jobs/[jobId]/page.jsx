@@ -1,3 +1,4 @@
+//src/app/jobs/[jobId]/page.jsx
 "use client"
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
@@ -32,6 +33,8 @@ export default function JobDetailPage() {
                 } else {
                     throw new Error(data.error || "Failed to fetch job details")
                 }
+
+
             } catch (err) {
                 setError(err.message)
                 // Mock data for development
@@ -62,6 +65,12 @@ export default function JobDetailPage() {
             fetchJob()
         }
     }, [params.jobId])
+
+    useEffect(() => {
+
+        console.log("Job details", job);
+
+    }, [job])
 
     const handleShare = async () => {
         try {
